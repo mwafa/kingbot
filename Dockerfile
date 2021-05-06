@@ -6,6 +6,6 @@ RUN sudo apt-get install -y nodejs && sudo npm install -g yarn
 
 WORKDIR /app
 COPY package.json package.json
-RUN yarn
+RUN sudo yarn
 COPY . .
 CMD node app.js
