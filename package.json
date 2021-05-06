@@ -1,0 +1,21 @@
+{
+  "name": "bahasa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@vercel/node": "^1.10.0"
+  },
+  "dependencies": {
+    "chromedriver": "^90.0.0",
+    "google-translate-api": "^2.3.0",
+    "node-telegram-bot-api": "^0.53.0",
+    "selenium-webdriver": "^4.0.0-beta.3"
+  }
+}
