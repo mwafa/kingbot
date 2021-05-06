@@ -23,7 +23,7 @@ const char = [
 
 function change(m) {
   const n = char.indexOf(m)
-  const i = n > 10 ? n - 10 : n + 10
+  const i = n >= 10 ? n - 10 : n + 10
   if (n == -1) return m.split("").map(change).join("")
   return char[i]
 }
