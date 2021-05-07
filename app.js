@@ -14,11 +14,11 @@ const log = (t) => {
 
 const handler = (msg, match, to = "jw", replay = 0) => {
   const chatId = msg.chat.id
-  const resp = replay ? msg.pinned_message.text : match[1]
-  const pin = replay ? msg.pinned_message.message_id : msg.message_id
+  const resp = replay ? msg.reply_to_message.text : match[1]
+  const pin = replay ? msg.reply_to_message.message_id : msg.message_id
 
   log(msg.text)
-  if (replay && !msg.pinned_message) return null
+  if (replay && !msg.reply_to_message) return null
   translate(resp, to)
     .then((out) => {
       bot.sendMessage(chatId, out, {
@@ -41,10 +41,11 @@ bot.onText(/\/walik (.+)/, (msg, match) => {
 
 bot.onText(/\/indo/, (msg, match) => handler(msg, match, "id", 1))
 bot.onText(/\/jowo/, (msg, match) => handler(msg, match, "jw", 1))
+bot.onText(/\/jawa/, (msg, match) => handler(msg, match, "jw", 1))
 bot.onText(/\/walik/, (msg, _) => {
   log(msg.text)
-  if (!msg.pinned_message) return null
-  bot.sendMessage(msg.chat.id, turn(msg.pinned_message.text), {
-    reply_to_message_id: msg.pinned_message.message_id,
+  if (!msg.reply_to_message) return null
+  bot.sendMessage(msg.chat.id, turn(msg.reply_to_message.text), {
+    reply_to_message_id: msg.reply_to_message.message_id,
   })
 })
