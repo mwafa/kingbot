@@ -21,6 +21,14 @@ const char = [
   "ng",
 ]
 
+const invalidChar = {
+  q: "k",
+  f: "p",
+  z: "j",
+  x: "s",
+  v: "p",
+}
+
 function change(m) {
   const n = char.indexOf(m)
   const i = n >= 10 ? n - 10 : n + 10
@@ -29,10 +37,15 @@ function change(m) {
 }
 
 function turn(text) {
-  const w = text.toLowerCase()
-  const reg = /([^aiueo\ \W\d]{1,2})/g
+  let w = text.toLowerCase()
+
+  for (const c of Object.keys(invalidChar)) {
+    w = w.replace(c, invalidChar[c])
+  }
+
+  const reg = /([^aiueo\ \W\d]{1,2})/gm
   return w
-    .replace(/(\b(a|i|u|e|o){1}\w+)/, "h$1")
+    .replace(/(\b(a|i|u|e|o){1}\w+)/gm, "h$1")
     .replace(reg, (m) => change(m) || "")
     .replace(/\b(h)(\w+)/gm, "$2")
 }
