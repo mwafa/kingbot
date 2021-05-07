@@ -31,7 +31,10 @@ function change(m) {
 function turn(text) {
   const w = text.toLowerCase()
   const reg = /([^aiueo\ \W\d]{1,2})/g
-  return w.replace(reg, (m) => change(m) || "")
+  return w
+    .replace(/(\b(a|i|u|e|o){1}\w+)/, "h$1")
+    .replace(reg, (m) => change(m) || "")
+    .replace(/\b(h)(\w+)/gm, "$2")
 }
 
 module.exports = turn
