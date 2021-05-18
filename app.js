@@ -6,7 +6,13 @@ const TelegramBot = require("node-telegram-bot-api")
 const turn = require("./walik/main")
 
 const token = process.env.BOT_TOKEN
-const bot = new TelegramBot(token, { polling: true })
+const bot = new TelegramBot(token, {
+  webHook: {
+    port: process.env.PORT,
+  },
+})
+
+bot.setWebHook(process.env.DOMAIN)
 
 const log = (t) => {
   console.log(`[${new Date().toISOString()}] ${t}`)
@@ -49,3 +55,5 @@ bot.onText(/\/walik/, (msg, _) => {
     reply_to_message_id: msg.reply_to_message.message_id,
   })
 })
+
+bot.getWebHookInfo().then(console.log)
