@@ -43,15 +43,15 @@ bot.onText(/\/([^\s]+)\ *(.+)*/i, (msg, match) => {
 
   switch (cmd) {
     case "walik":
-      send(turn(text))
+      send(turn(input))
       break
     case "indo":
-      translate(text, "id")
+      translate(input, "id")
         .then((e) => send(e))
         .catch(console.error)
       break
     case "jowo":
-      translate(text)
+      translate(input)
         .then((e) => send(e))
         .catch(console.error)
       break
