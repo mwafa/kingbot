@@ -1,59 +1,64 @@
 require("dotenv").config()
 
-const translate = require("./tr")
-
 const TelegramBot = require("node-telegram-bot-api")
-const turn = require("./walik/main")
+const log = require("./utils/log")
+const translate = require("./utils/translate")
+const turn = require("./utils/turn")
 
-const token = process.env.BOT_TOKEN
-const bot = new TelegramBot(token, {
+const TOKEN = process.env.BOT_TOKEN
+const DOMAIN = process.env.DOMAIN
+const PORT = process.env.PORT || 3000
+
+const bot = new TelegramBot(TOKEN, {
   webHook: {
-    port: process.env.PORT,
+    port: PORT,
   },
 })
 
-bot.setWebHook(process.env.DOMAIN)
+bot
+  .setWebHook(DOMAIN + TOKEN)
+  .then(() => bot.getWebHookInfo())
+  .then(console.log)
 
-const log = (t) => {
-  console.log(`[${new Date().toISOString()}] ${t}`)
-}
+bot.onText(/\/([^\s]+)\ *(.+)*/i, (msg, match) => {
+  const [_, cmd, text, ...__] = match
 
-const handler = (msg, match, to = "jw", replay = 0) => {
-  const chatId = msg.chat.id
-  const resp = replay ? msg.reply_to_message.text : match[1]
-  const pin = replay ? msg.reply_to_message.message_id : msg.message_id
+  let [input, replyTo] = ["", 0]
+  if (msg.reply_to_message) {
+    input = msg.reply_to_message.text
+    replyTo = msg.reply_to_message.message_id
+  } else {
+    input = text
+    replyTo = msg.message_id
+  }
 
+  if (!input) return log(msg.text + " : No Input")
   log(msg.text)
-  if (replay && !msg.reply_to_message) return null
-  translate(resp, to)
-    .then((out) => {
-      bot.sendMessage(chatId, out, {
-        reply_to_message_id: pin,
-      })
+
+  function send(t) {
+    bot.sendMessage(msg.chat.id, t, {
+      reply_to_message_id: replyTo,
     })
-    .catch(log)
-}
+  }
 
-bot.onText(/\/jowo (.+)/, (msg, match) => handler(msg, match))
-bot.onText(/\/jawa (.+)/, (msg, match) => handler(msg, match))
-bot.onText(/\/indo (.+)/, (msg, match) => handler(msg, match, "id"))
-
-bot.onText(/\/walik (.+)/, (msg, match) => {
-  log(msg.text)
-  bot.sendMessage(msg.chat.id, turn(match[1]), {
-    reply_to_message_id: msg.message_id,
-  })
+  switch (cmd) {
+    case "walik":
+      send(turn(text))
+      break
+    case "indo":
+      translate(text, "id")
+        .then((e) => send(e))
+        .catch(console.error)
+      break
+    case "jowo":
+      translate(text)
+        .then((e) => send(e))
+        .catch(console.error)
+      break
+    default:
+      log(`Command "${cmd}" not found!`)
+      break
+  }
 })
 
-bot.onText(/\/indo/, (msg, match) => handler(msg, match, "id", 1))
-bot.onText(/\/jowo/, (msg, match) => handler(msg, match, "jw", 1))
-bot.onText(/\/jawa/, (msg, match) => handler(msg, match, "jw", 1))
-bot.onText(/\/walik/, (msg, _) => {
-  log(msg.text)
-  if (!msg.reply_to_message) return null
-  bot.sendMessage(msg.chat.id, turn(msg.reply_to_message.text), {
-    reply_to_message_id: msg.reply_to_message.message_id,
-  })
-})
-
-bot.getWebHookInfo().then(console.log)
+bot.on("webhook_error", console.error)
