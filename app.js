@@ -55,6 +55,11 @@ bot.onText(/\/([^\s]+)\ *(.+)*/i, (msg, match) => {
         .then((e) => send(e))
         .catch(console.error)
       break
+    case "jawa":
+      translate(input)
+        .then((e) => send(e))
+        .catch(console.error)
+      break
     default:
       log(`Command "${cmd}" not found!`)
       break
